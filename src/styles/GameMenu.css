@@ -1,0 +1,182 @@
+.game-menu {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  animation: fadeIn 0.5s ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.game-menu__title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+/* Difficulty / tier buttons that replace the Mathdrops tile when expanded */
+.game-card__tier-select {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+.difficulty-buttons {
+  display: flex;
+  gap: 0.6rem;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.difficulty-buttons .difficulty {
+  flex: 1 1 0;
+  padding: 0.9rem 0.6rem;
+  border-radius: 14px;
+  border: 2px solid rgba(255,255,255,0.25);
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.difficulty-buttons .difficulty::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.difficulty-buttons .difficulty:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.4);
+}
+
+.difficulty-buttons .difficulty:hover::before {
+  opacity: 1;
+}
+
+.difficulty-buttons .difficulty:active {
+  transform: translateY(1px);
+}
+
+/* Make sure buttons are comfortably sized on small screens */
+@media (max-width: 420px) {
+  .difficulty-buttons .difficulty {
+    padding: 1rem 0.6rem;
+    font-size: 1.05rem;
+    border-radius: 12px;
+  }
+}
+
+.game-menu__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  padding-bottom: 1rem;
+}
+
+.game-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  color: white;
+  text-decoration: none;
+}
+
+.game-card:active {
+  transform: scale(0.98);
+}
+
+.game-card:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.game-card__icon {
+  font-size: 2.3rem;
+  animation: bounce 2s infinite;
+}
+
+.game-card__content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.game-card__name {
+  font-size: 1.15rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.game-card__description {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  text-align: center;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Tablet and desktop */
+@media (min-width: 768px) {
+  .game-menu__title {
+    font-size: 3.5rem;
+  }
+  
+  .game-menu__grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    max-width: 1000px;
+  }
+}

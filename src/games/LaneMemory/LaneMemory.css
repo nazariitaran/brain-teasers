@@ -1,0 +1,275 @@
+.lane-memory-game {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  box-sizing: border-box;
+  gap: 1rem;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  position: relative;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.lives {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.life {
+  font-size: 1.5rem;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.life--empty {
+  opacity: 0.3;
+  filter: grayscale(100%);
+}
+
+.round {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.instruction-panel {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  min-height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.instruction-text {
+  animation: fadeIn 0.3s ease;
+}
+
+.instruction-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.5px;
+}
+
+.instruction-subtitle {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  font-weight: 400;
+}
+
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.lanes-container {
+  flex: 1;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  min-height: 0;
+  justify-content: center;
+}
+
+.lane {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  max-width: 100px;
+  position: relative;
+  transform: scale(1);
+  -webkit-tap-highlight-color: transparent;
+  appearance: none;
+}
+
+.lane:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.lane:not(:disabled):active {
+  transform: scale(0.95);
+}
+
+.lane--active {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border-color: #FFD700;
+  animation: laneGlow 1s ease;
+}
+
+.lane--active.lane--correct {
+  background: linear-gradient(135deg, #4CAF50, #8BC34A) !important;
+  border-color: #4CAF50 !important;
+}
+
+.lane--active.lane--incorrect {
+  background: linear-gradient(135deg, #f44336, #e91e63) !important;
+  border-color: #f44336 !important;
+}
+
+@keyframes laneGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.8), inset 0 0 25px rgba(255, 255, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.2);
+  }
+}
+
+.turn-indicator {
+  padding: 1rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+
+.turn-text {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.turn-progress {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.progress-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.progress-dot--completed {
+  background: rgba(81, 207, 102, 0.7);
+  border-color: rgba(81, 207, 102, 0.9);
+}
+
+.progress-dot--current {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+  }
+}
+
+.feedback {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+  animation: feedback-appear 0.3s ease-out;
+}
+
+.feedback--correct {
+  background: rgba(76, 175, 80, 0.9);
+}
+
+.feedback--incorrect {
+  background: rgba(244, 67, 54, 0.9);
+}
+
+@keyframes feedback-appear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 768px) {
+  .lane-memory-game {
+    gap: 1.5rem;
+    padding: 2rem;
+  }
+
+  .game-header {
+    padding: 1rem 1.5rem;
+    font-size: 1.2rem;
+  }
+
+  .instruction-panel {
+    padding: 1.5rem;
+    min-height: 5rem;
+  }
+
+  .instruction-title {
+    font-size: 1.6rem;
+  }
+
+  .instruction-subtitle {
+    font-size: 1.05rem;
+  }
+
+  .lane {
+    max-width: 150px;
+  }
+
+  .lanes-container {
+    padding: 2rem;
+    gap: 2rem;
+  }
+
+  .turn-indicator {
+    padding: 1.5rem;
+  }
+
+  .turn-text {
+    font-size: 1.05rem;
+  }
+}

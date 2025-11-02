@@ -1,0 +1,364 @@
+.memory-tiles-game {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  overflow: hidden;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+  gap: 1rem;
+  position: relative;
+}
+
+.health {
+  display: flex;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.heart {
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.heart--empty {
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.game-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 0 0 auto;
+}
+
+.score {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+}
+
+.round {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.pause-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.pause-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.pause-button:disabled {
+  opacity: 0.5;
+}
+
+.game-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.phase-indicator {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 5;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.phase-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 0.4rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.phase-timer {
+  width: 120px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.timer-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  animation: timer-countdown linear forwards;
+  transform-origin: left;
+}
+
+@keyframes timer-countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.feedback {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+  animation: feedback-appear 0.3s ease-out;
+}
+
+.feedback--correct {
+  background: rgba(76, 175, 80, 0.9);
+}
+
+.feedback--incorrect {
+  background: rgba(244, 67, 54, 0.9);
+}
+
+@keyframes feedback-appear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.tiles-grid {
+  display: grid;
+  gap: clamp(0.25rem, 1vw, 0.5rem);
+  width: calc(min(90vw, 80vh));
+  padding: 0;
+  margin: 0 auto;
+  place-content: center;
+  place-items: stretch;
+}
+
+.tile {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  aspect-ratio: 1 / 1;
+}
+
+.tile:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.tile:disabled {
+  cursor: default;
+}
+
+.tile--target {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border-color: #FFD700;
+  animation: pulse-glow 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+  }
+}
+
+.tile--clicked {
+  transform: scale(0.9);
+}
+
+.tile--correct {
+  background: linear-gradient(135deg, #4CAF50, #8BC34A) !important;
+  border-color: #4CAF50 !important;
+  animation: correct-bounce 0.5s ease;
+}
+
+@keyframes correct-bounce {
+  0%, 100% {
+    transform: scale(0.9);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.tile--wrong {
+  background: linear-gradient(135deg, #f44336, #e91e63) !important;
+  border-color: #f44336 !important;
+  animation: wrong-shake 0.5s ease;
+}
+
+@keyframes wrong-shake {
+  0%, 100% {
+    transform: translateX(0) scale(0.9);
+  }
+  25% {
+    transform: translateX(-5px) scale(0.9);
+  }
+  75% {
+    transform: translateX(5px) scale(0.9);
+  }
+}
+
+.hint-text {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+}
+
+.pause-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.pause-message {
+  font-size: 3rem;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+/* Safe area for iOS devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .game-container {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Tablet and desktop */
+@media (min-width: 768px) {
+  .game-header {
+    padding: 1.5rem 2rem;
+  }
+  
+  .heart {
+    font-size: 2rem;
+  }
+  
+  .score {
+    font-size: 1.3rem;
+  }
+  
+  .round {
+    font-size: 1rem;
+  }
+  
+  .pause-button {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+  
+  .tiles-grid {
+    width: calc(min(85vw, 75vh));
+    gap: 0.75rem;
+  }
+  
+  .phase-text {
+    font-size: 1.5rem;
+  }
+  
+  .phase-timer {
+    width: 150px;
+    height: 6px;
+  }
+  
+  .feedback {
+    font-size: 2.5rem;
+  }
+}
+
+/* Small phones and landscape */
+@media (max-height: 600px) {
+  .tiles-grid {
+    width: calc(min(80vw, 50vh));
+  }
+  
+  .game-container {
+    padding: 0.5rem;
+  }
+  
+  .phase-text {
+    font-size: 1.2rem;
+  }
+}
