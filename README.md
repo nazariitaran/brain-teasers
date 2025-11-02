@@ -1,73 +1,56 @@
-# React + TypeScript + Vite
+# Memory Games Collection
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A collection of engaging memory and cognitive training games built with React and TypeScript. Each game features multiple difficulty levels and progressive challenges.
 
-Currently, two official plugins are available:
+## Games
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 1. Memory Tiles
+A grid-based visual memory game where players must remember and identify highlighted tiles. Features:
+- Adjustable grid size (3x3 to 7x7)
+- Three difficulty levels
+- Progressive complexity with expanding grid
+- Score tracking per difficulty level
 
-## React Compiler
+### 2. Lane Memory
+A sequence memory game where players reproduce patterns of lane activations:
+- Three vertical lanes with light-up sequences
+- Progressive difficulty with longer sequences
+- Multiple difficulty levels
+- Visual feedback for correct/incorrect moves
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 3. Mathdrops
+A mathematical challenge game where expressions fall from the screen top:
+- Real-time arithmetic problem solving
+- Progressive difficulty with larger numbers
+- Three difficulty levels
+- Adaptive expression complexity
 
-## Expanding the ESLint configuration
+## Features
+- Persistent high scores for each game and difficulty
+- Responsive design for mobile and desktop
+- Visual feedback and animations
+- Lives system (3 lives per game)
+- Difficulty selection for each game
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack
+- React
+- TypeScript
+- Vite
+- Zustand for state management
+- CSS Modules for styling
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+```bash
+# Install dependencies
+npm install
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## License
+MIT
