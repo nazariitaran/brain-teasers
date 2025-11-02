@@ -18,13 +18,6 @@ const LaneMemory: React.FC = () => {
   const { getSelectedDifficulty } = useGameStore();
   const difficulty = getSelectedDifficulty('lane-memory');
 
-  // Initial turns based on difficulty
-  const initialTurns = {
-    easy: 2,
-    medium: 4,
-    hard: 6
-  }[difficulty];
-  
   const [round, setRound] = useState(1);
   const [lives, setLives] = useState(3);
   const [score, setScore] = useState(0);
@@ -187,7 +180,7 @@ const LaneMemory: React.FC = () => {
         }, 800);
       }
     },
-    [phase, sequence, playerInput, lives, round, currentTurnIdx, currentTurnClicks, playSequence, generateSequence, updateScore]
+    [phase, sequence, playerInput, lives, round, currentTurnIdx, currentTurnClicks, playSequence, generateSequence, updateScore, difficulty, score]
   );
 
   const handleRulesStart = (dontShowAgain: boolean) => {
