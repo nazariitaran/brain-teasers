@@ -2,6 +2,8 @@
 
 A collection of engaging memory and cognitive training games built with React and TypeScript. Each game features multiple difficulty levels and progressive challenges.
 
+https://brain-teasers.pages.dev
+
 ## Games
 
 ### 1. Memory Tiles
