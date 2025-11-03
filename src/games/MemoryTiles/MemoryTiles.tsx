@@ -333,22 +333,9 @@ const MemoryTiles: React.FC = () => {
           ))}
         </div>
         
-        <div className="game-header-center">
-          {phase === 'showing' && (
-            <div className="phase-indicator">
-              <div className="phase-timer">
-                <div
-                  className="timer-bar"
-                  style={{ animationDuration: `${showDuration}ms` }}
-                />
-              </div>
-            </div>
-          )}
-          
-          <div className="game-info">
-            <div className="score">Score: {score}</div>
-            {/* <div className="round">Round {round}</div> */}
-          </div>
+        <div className="game-info">
+          <div className="score">Score: {score}</div>
+          {/* <div className="round">Round {round}</div> */}
         </div>
         
         <button className="end-game-button" onClick={handleEndGameClick} title="End Game">
