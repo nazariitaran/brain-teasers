@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useGameStore } from '../../store/gameStore';
 import GameEnd from '../../components/GameEnd';
 import RulesPopup from '../../components/RulesPopup';
+import EndGamePopup from '../../components/EndGamePopup';
 import './LaneMemory.css';
 
 interface Turn {
@@ -30,6 +31,7 @@ const LaneMemory: React.FC = () => {
   const [currentTurnClicks, setCurrentTurnClicks] = useState<('left' | 'center' | 'right')[]>([]);
   const [showRules, setShowRules] = useState(false);
   const [wrongLane, setWrongLane] = useState<('left' | 'center' | 'right') | null>(null);
+  const [showEndGamePopup, setShowEndGamePopup] = useState(false);
 
   const { updateScore, resetCurrentScore, hasSeenRules, setRulesShown } = useGameStore();
 
@@ -211,6 +213,20 @@ const LaneMemory: React.FC = () => {
     setSequence(initialSeq);
   };
 
+  const handleEndGameClick = () => {
+    setShowEndGamePopup(true);
+  };
+
+  const handleConfirmEndGame = () => {
+    setShowEndGamePopup(false);
+    setPhase('game-over');
+    updateScore(`lane-memory-${difficulty}`, score);
+  };
+
+  const handleContinueGame = () => {
+    setShowEndGamePopup(false);
+  };
+
   // Initialize game on mount
   useEffect(() => {
     if (!hasSeenRules('lane-memory')) {
@@ -245,7 +261,7 @@ const LaneMemory: React.FC = () => {
     return (
       <RulesPopup
         title="Lane Memory"
-        rules="Watch the 3 lanes light up in a sequence. Then tap the lanes in the same order! Each round the sequence gets longer. Get 3 wrong and it's game over. 🎮"
+        rules="Watch the 3 lanes light up in a sequence. When lanes light up one by one, tap them in the same order. When multiple lanes light up together, you can tap them in any order! Each round the sequence gets longer. Get 3 wrong and it's game over. 🎮"
         onStart={handleRulesStart}
       />
     );
@@ -253,6 +269,12 @@ const LaneMemory: React.FC = () => {
 
   return (
     <div className="lane-memory-game">
+      {showEndGamePopup && (
+        <EndGamePopup
+          onEndGame={handleConfirmEndGame}
+          onContinue={handleContinueGame}
+        />
+      )}
       <div className="game-header">
         <div className="lives">
           {[...Array(3)].map((_, i) => (
@@ -266,6 +288,9 @@ const LaneMemory: React.FC = () => {
           <div className="score">Score: {score}</div>
           {/* <div className="round">Round {round}</div> */}
         </div>
+        <button className="end-game-button" onClick={handleEndGameClick} title="End Game">
+          ⏹️
+        </button>
       </div>
 
       <div className="instruction-panel">

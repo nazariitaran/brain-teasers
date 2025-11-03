@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useGameStore } from '../../store/gameStore';
 import GameEnd from '../../components/GameEnd';
 import RulesPopup from '../../components/RulesPopup';
+import EndGamePopup from '../../components/EndGamePopup';
 import './Mathdrops.css';
 
 interface Raindrop {
@@ -24,6 +25,7 @@ const Mathdrops: React.FC = () => {
   // Selected starting difficulty is chosen from the main menu and persisted in the store
   const difficultyLabel = useGameStore(state => state.getSelectedDifficulty('mathdrops'));
   const [showRules, setShowRules] = useState(false);
+  const [showEndGamePopup, setShowEndGamePopup] = useState(false);
 
   const gameLoopRef = useRef<number>(0);
   const dropIntervalRef = useRef<number>(0);
@@ -101,7 +103,7 @@ const Mathdrops: React.FC = () => {
       answer,
       x: Math.random() * (containerWidth - dropWidth),
       y: -40,
-      speed: 0.7,
+      speed: 0.8,
       created: Date.now()
     };
 
@@ -192,6 +194,21 @@ const Mathdrops: React.FC = () => {
     resetCurrentScore(`mathdrops-${difficultyLabel}`);
   };
 
+  const handleEndGameClick = () => {
+    setShowEndGamePopup(true);
+  };
+
+  const handleConfirmEndGame = () => {
+    setShowEndGamePopup(false);
+    setGameOver(true);
+    const scoreKey = `mathdrops-${difficultyLabel}`;
+    updateScore(scoreKey, score);
+  };
+
+  const handleContinueGame = () => {
+    setShowEndGamePopup(false);
+  };
+
   // Initialize game on mount or when rules are dismissed
   useEffect(() => {
     if (!hasSeenRules('mathdrops') && !showRules) {
@@ -202,7 +219,7 @@ const Mathdrops: React.FC = () => {
 
   // Game loop
   useEffect(() => {
-    if (gameOver || showRules) return;
+    if (gameOver || showRules || showEndGamePopup) return;
 
     const scoreKey = `mathdrops-${difficultyLabel}`;
 
@@ -244,11 +261,11 @@ const Mathdrops: React.FC = () => {
         cancelAnimationFrame(gameLoopRef.current);
       }
     };
-  }, [gameOver, health, score, updateScore, showRules, difficultyLabel]);
+  }, [gameOver, health, score, updateScore, showRules, showEndGamePopup, difficultyLabel]);
 
   // Drop creation interval
   useEffect(() => {
-    if (gameOver || showRules) return;
+    if (gameOver || showRules || showEndGamePopup) return;
 
     const interval = 2500; // Keep constant interval between drops
     dropIntervalRef.current = window.setInterval(createRaindrop, interval);
@@ -258,7 +275,7 @@ const Mathdrops: React.FC = () => {
         clearInterval(dropIntervalRef.current);
       }
     };
-  }, [createRaindrop, gameOver, showRules]);
+  }, [createRaindrop, gameOver, showRules, showEndGamePopup]);
 
   const scoreKey = `mathdrops-${difficultyLabel}`;
 
@@ -279,6 +296,12 @@ const Mathdrops: React.FC = () => {
 
   return (
     <div className="mathdrops-game">
+      {showEndGamePopup && (
+        <EndGamePopup
+          onEndGame={handleConfirmEndGame}
+          onContinue={handleContinueGame}
+        />
+      )}
       <div className="game-header">
         <div className="health">
           {[...Array(3)].map((_, i) => (
@@ -289,6 +312,9 @@ const Mathdrops: React.FC = () => {
         </div>
 
         <div className="score">Score: {score}</div>
+        <button className="end-game-button" onClick={handleEndGameClick} title="End Game">
+          ⏹️
+        </button>
       </div>
 
       <div className="mathdrops-container" ref={containerRef}>

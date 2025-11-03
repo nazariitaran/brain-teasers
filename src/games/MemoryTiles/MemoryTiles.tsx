@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useGameStore } from '../../store/gameStore';
 import GameEnd from '../../components/GameEnd';
 import RulesPopup from '../../components/RulesPopup';
+import EndGamePopup from '../../components/EndGamePopup';
 import './MemoryTiles.css';
 
 interface Tile {
@@ -33,6 +34,7 @@ const MemoryTiles: React.FC = () => {
   const [phase, setPhase] = useState<GamePhase>('showing');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [showRules, setShowRules] = useState(false);
+  const [showEndGamePopup, setShowEndGamePopup] = useState(false);
   
   const roundsPerExpansion = 3; // Grid expands every 3 rounds
   // Calculate show duration based on grid size - 3.5s for 5x5 and larger, 3s for smaller grids
@@ -250,6 +252,20 @@ const MemoryTiles: React.FC = () => {
       initializeGrid(undefined, 1);
     }, 100);
   };
+
+  const handleEndGameClick = () => {
+    setShowEndGamePopup(true);
+  };
+
+  const handleConfirmEndGame = () => {
+    setShowEndGamePopup(false);
+    setGameOver(true);
+    updateScore(`memory-tiles-${difficulty}`, score);
+  };
+
+  const handleContinueGame = () => {
+    setShowEndGamePopup(false);
+  };
   
   // Initialize game on mount
   useEffect(() => {
@@ -302,6 +318,12 @@ const MemoryTiles: React.FC = () => {
   
   return (
     <div className="memory-tiles-game">
+      {showEndGamePopup && (
+        <EndGamePopup
+          onEndGame={handleConfirmEndGame}
+          onContinue={handleContinueGame}
+        />
+      )}
       <div className="game-header">
         <div className="health">
           {[...Array(3)].map((_, i) => (
@@ -311,21 +333,27 @@ const MemoryTiles: React.FC = () => {
           ))}
         </div>
         
-        {phase === 'showing' && (
-          <div className="phase-indicator">
-            <div className="phase-timer">
-              <div
-                className="timer-bar"
-                style={{ animationDuration: `${showDuration}ms` }}
-              />
+        <div className="game-header-center">
+          {phase === 'showing' && (
+            <div className="phase-indicator">
+              <div className="phase-timer">
+                <div
+                  className="timer-bar"
+                  style={{ animationDuration: `${showDuration}ms` }}
+                />
+              </div>
             </div>
+          )}
+          
+          <div className="game-info">
+            <div className="score">Score: {score}</div>
+            {/* <div className="round">Round {round}</div> */}
           </div>
-        )}
-        
-        <div className="game-info">
-          <div className="score">Score: {score}</div>
-          {/* <div className="round">Round {round}</div> */}
         </div>
+        
+        <button className="end-game-button" onClick={handleEndGameClick} title="End Game">
+          ⏹️
+        </button>
       </div>
       
       <div className="game-container">

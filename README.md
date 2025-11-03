@@ -4,6 +4,8 @@ A collection of engaging memory and cognitive training games built with React an
 
 https://brain-teasers.pages.dev
 
+![Cover](cover.png)
+
 ## Games
 
 ### 1. Memory Tiles

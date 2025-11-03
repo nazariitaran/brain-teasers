@@ -16,9 +16,13 @@ memory-games/
 ├── src/
 │   ├── components/        # Shared components
 │   │   ├── GameMenu.tsx   # Main menu for game selection
-│   │   └── GameEnd.tsx    # Reusable game over screen
+│   │   ├── GameEnd.tsx    # Reusable game over screen
+│   │   ├── RulesPopup.tsx # Game rules display popup
+│   │   └── EndGamePopup.tsx # End game confirmation dialog
 │   ├── games/             # Individual game implementations
-│   │   └── Raindrops/     # Math expression game
+│   │   ├── Mathdrops/     # Math expression game
+│   │   ├── MemoryTiles/   # Memory tile matching game
+│   │   └── LaneMemory/    # Lane sequence memory game
 │   ├── store/             # Zustand state management
 │   │   └── gameStore.ts   # Global game state and scores
 │   ├── styles/            # Component-specific styles
@@ -40,9 +44,12 @@ memory-games/
 ### Game Flow Pattern
 All games follow this consistent pattern:
 1. **Menu Selection**: User selects game from main menu
-2. **Gameplay**: Core game mechanics specific to each game
-3. **Game End**: Shows current score and highest score
-4. **Options**: Play again or return to menu
+2. **Rules Display**: Optional rules popup (can be disabled with "Don't show again")
+3. **Gameplay**: Core game mechanics specific to each game
+   - **End Game Option**: Players can click the End Game button (⏹️) in the header to voluntarily end the game
+   - **Confirmation Dialog**: Shows popup asking to "End Game" or "Continue Playing"
+4. **Game End**: Shows current score and highest score
+5. **Options**: Play again or return to menu
 
 Note: Some games expose a starting Difficulty selection directly in the main menu. For example, `Mathdrops` replaces its game tile with three difficulty buttons (Easy / Medium / Hard) when tapped — the user picks a difficulty and the game starts with that starting difficulty. The selected starting difficulty is persisted to the store and used to compute expression magnitudes; in-game numeric progression remains unchanged.
 
@@ -60,13 +67,27 @@ Create a new folder in `src/games/YourGame/` with:
 
 ### Step 2: Game Component Structure
 ```typescript
+import EndGamePopup from '../../components/EndGamePopup';
+import RulesPopup from '../../components/RulesPopup';
+
 const YourGame: React.FC = () => {
   // Game state
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
+  const [showRules, setShowRules] = useState(false);
+  const [showEndGamePopup, setShowEndGamePopup] = useState(false);
   
   // Zustand hooks
-  const { updateScore, resetCurrentScore } = useGameStore();
+  const { updateScore, resetCurrentScore, hasSeenRules, setRulesShown } = useGameStore();
+  
+  // End Game handlers
+  const handleEndGameClick = () => setShowEndGamePopup(true);
+  const handleConfirmEndGame = () => {
+    setShowEndGamePopup(false);
+    setGameOver(true);
+    updateScore('yourgame', score);
+  };
+  const handleContinueGame = () => setShowEndGamePopup(false);
   
   // Game logic here
   
@@ -74,9 +95,35 @@ const YourGame: React.FC = () => {
     return <GameEnd gameName="yourgame" onPlayAgain={resetGame} />;
   }
   
+  if (showRules) {
+    return (
+      <RulesPopup
+        title="Your Game"
+        rules="Game rules description here"
+        onStart={(dontShowAgain) => {
+          if (dontShowAgain) setRulesShown('yourgame', true);
+          setShowRules(false);
+        }}
+      />
+    );
+  }
+  
   return (
     <div className="yourgame">
-      {/* Game UI */}
+      {showEndGamePopup && (
+        <EndGamePopup
+          onEndGame={handleConfirmEndGame}
+          onContinue={handleContinueGame}
+        />
+      )}
+      <div className="game-header">
+        <div className="health">{/* Health indicators */}</div>
+        <div className="score">Score: {score}</div>
+        <button className="end-game-button" onClick={handleEndGameClick} title="End Game">
+          ⏹️
+        </button>
+      </div>
+      {/* Rest of game UI */}
     </div>
   );
 };
@@ -133,6 +180,39 @@ const games = [
 - **Gradients**: Use linear gradients for backgrounds and buttons
 - **Animations**: Keep smooth with `transition: all 0.3s ease;`
 - **Touch Feedback**: Use `:active` states with `transform: scale(0.95);`
+- **End Game Button**: Circular button with red hover state for game termination
+
+## End Game Feature
+
+### Overview
+All games include an End Game button (⏹️) in the header that allows players to voluntarily end a game at any time. When clicked, a confirmation dialog appears to prevent accidental termination.
+
+### Components
+- **EndGamePopup.tsx** - Confirmation dialog with two actions:
+  - "Continue Playing" - Resumes the game
+  - "End Game" - Saves current score and shows game end screen
+- **EndGamePopup.css** - Glassmorphism styled modal with animations
+
+### Implementation in Games
+1. Import `EndGamePopup` component
+2. Add state: `const [showEndGamePopup, setShowEndGamePopup] = useState(false);`
+3. Add handlers:
+   ```typescript
+   const handleEndGameClick = () => setShowEndGamePopup(true);
+   const handleConfirmEndGame = () => {
+     setShowEndGamePopup(false);
+     setGameOver(true);
+     updateScore(`gameName-${difficulty}`, score);
+   };
+   ```
+4. Include in game loops: Check `showEndGamePopup` in effect dependencies to pause game
+5. Render button in header: `<button className="end-game-button" onClick={handleEndGameClick}>⏹️</button>`
+6. Render popup: `{showEndGamePopup && <EndGamePopup onEndGame={handleConfirmEndGame} onContinue={handleContinueGame} />}`
+
+### CSS Classes
+- `.end-game-button` - Circular button (40px mobile, 50px desktop) with red hover state
+- `.end-game-popup-overlay` - Full-screen semi-transparent backdrop
+- `.end-game-popup` - Centered modal with glassmorphism effect
 
 ## Game-Specific Guidelines
 
@@ -149,10 +229,16 @@ Always use custom on-screen controls instead of system inputs:
 </div>
 ```
 
+### Game Lifecycle Management
+- **Game Loop Pausing**: Include `showEndGamePopup` in game loop conditions to pause when confirmation dialog appears
+- **Score Recording**: Always save current score when game ends voluntarily or naturally
+- **State Cleanup**: Clear timeouts, intervals, and animation frames in `useEffect` cleanup
+
 ### Performance Considerations
 - Use `requestAnimationFrame` for smooth animations
 - Clean up intervals and animations in `useEffect` cleanup
 - Use `useCallback` for event handlers to prevent unnecessary re-renders
+- Pause game loops when popups are shown to prevent background execution
 
 ### Difficulty Progression
 - Start simple and gradually increase complexity
