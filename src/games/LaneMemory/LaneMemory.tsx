@@ -346,7 +346,7 @@ const LaneMemory: React.FC = () => {
         {phase === 'waiting-input' && (
           <div className="instruction-text">
             <div className="instruction-title">Your turn!</div>
-            <div className="instruction-subtitle">Tap all lanes that lit up for this turn{sequence?.turns[currentTurnIdx]?.lanes.length > 1 ? ' (you can tap multiple at once!)' : ''}</div>
+            <div className="instruction-subtitle">Tap all lanes that lit up for this turn{sequence?.turns[currentTurnIdx]?.lanes?.length > 1 ? ' (you can tap multiple at once!)' : ''}</div>
           </div>
         )}
         {phase === 'validating' && (
