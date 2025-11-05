@@ -9,6 +9,7 @@ A memory game where players watch and reproduce sequences of lane activations. P
 - **3 Lanes**: Vertical lanes that light up in sequences
 - **Sequence Display Phase**: Game automatically shows the pattern (yellow highlight)
 - **Replay Phase**: Player recreates the pattern by clicking lanes (green for correct, red for incorrect)
+- **Multitouch Support**: When multiple lanes light up simultaneously, players can tap them all at once
 - **Progressive Difficulty**: Each round adds one turn to remember
 
 ### Difficulty System
@@ -42,7 +43,8 @@ A memory game where players watch and reproduce sequences of lane activations. P
 2. Display sequence automatically (lanes highlight for 1s each, 0.8s pause between turns)
 3. Enter replay phase - player clicks lanes
 4. For each turn:
-   - Player clicks lanes (any order within the turn)
+   - Player clicks lanes (any order within the turn, can tap multiple simultaneously)
+   - Multitouch: When multiple lanes are required, players can tap them all at once
    - Clicked lanes stay highlighted (yellow during sequence, green when correct, red when incorrect)
    - Once all lanes for turn are clicked correctly → show "✓ Turn Complete!" and move to next turn
 5. Once all turns complete → show "✅ Correct!" popup and proceed to next round
@@ -71,11 +73,15 @@ src/games/LaneMemory/
 - `validationState`: 'correct' | 'incorrect' | null (for lane color feedback)
 - `currentTurnIdx`: Which turn player is on
 - `currentTurnClicks`: Lanes clicked in current turn
+- `activeTouches`: Set of lanes currently being touched (for multitouch)
 
 ### Functions
 - `generateSequence(roundNum)`: Creates random sequence with N turns
 - `playSequence(seq)`: Animates sequence display
-- `handleLaneClick(lane)`: Processes player input, validates correctness
+- `processLaneInput(lanes[])`: Processes multiple lane inputs simultaneously
+- `handleLaneClick(lane)`: Single lane click handler (calls processLaneInput)
+- `handleLanesTouchStart(lane, event)`: Touch start handler for multitouch
+- `handleLanesTouchEnd(event)`: Touch end handler that processes all active touches
 - `resetGame()`: Resets all state for new game
 
 ## Styling
@@ -109,7 +115,7 @@ src/games/LaneMemory/
 
 ### Instruction Panel
 - **Watch the sequence**: During playback
-- **Your turn!**: When waiting for input
+- **Your turn!**: When waiting for input (shows "you can tap multiple at once!" when multiple lanes are required)
 - **❌ Wrong!**: On incorrect click
 - **✓ Turn Complete!**: When turn is successfully completed
 - **🎉 Round Complete!**: When round is successfully completed (also shows in center popup)
@@ -155,10 +161,12 @@ Game uses Zustand with persist middleware to store:
 ## Notable Implementation Details
 
 1. **Turn-based validation**: Player can click lanes in any order within a turn, as long as all required lanes are clicked
-2. **Immediate feedback**: Lanes stay highlighted as player clicks them (green for correct)
-3. **No time limit**: Players can take as long as needed to complete turns - only correctness matters
-4. **Sequential progression**: Difficulty increases linearly (Round 1 = 2 turns, Round N = N+1 turns)
-5. **Persistent highlighting**: During a turn, all previously clicked lanes remain highlighted until turn completes
+2. **Multitouch support**: Uses touch events to detect simultaneous taps on multiple lanes
+3. **Touch event handling**: `onTouchStart` tracks active touches, `onTouchEnd` processes all simultaneous touches
+4. **Immediate feedback**: Lanes stay highlighted as player clicks them (green for correct)
+5. **No time limit**: Players can take as long as needed to complete turns - only correctness matters
+6. **Sequential progression**: Difficulty increases linearly (Round 1 = 2 turns, Round N = N+1 turns)
+7. **Persistent highlighting**: During a turn, all previously clicked lanes remain highlighted until turn completes
 
 ## Future Enhancement Ideas
 

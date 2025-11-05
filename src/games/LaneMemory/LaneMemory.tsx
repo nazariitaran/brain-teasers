@@ -32,6 +32,7 @@ const LaneMemory: React.FC = () => {
   const [showRules, setShowRules] = useState(false);
   const [wrongLane, setWrongLane] = useState<('left' | 'center' | 'right') | null>(null);
   const [showEndGamePopup, setShowEndGamePopup] = useState(false);
+  const [activeTouches, setActiveTouches] = useState<Set<'left' | 'center' | 'right'>>(new Set());
 
   const { updateScore, resetCurrentScore, hasSeenRules, setRulesShown } = useGameStore();
 
@@ -97,18 +98,21 @@ const LaneMemory: React.FC = () => {
   }, []);
 
 
-  const handleLaneClick = useCallback(
-    (lane: 'left' | 'center' | 'right') => {
-      if (phase !== 'waiting-input' || !sequence) return;
+  const processLaneInput = useCallback(
+    (lanes: ('left' | 'center' | 'right')[]) => {
+      if (phase !== 'waiting-input' || !sequence || lanes.length === 0) return;
 
-      // Check if this lane is in the current turn
       const currentTurn = sequence.turns[currentTurnIdx];
-      if (!currentTurn.lanes.includes(lane)) {
-        // Wrong lane - lose a life and show correct lanes
+      
+      // Check if all touched lanes are valid for this turn
+      const invalidLanes = lanes.filter(lane => !currentTurn.lanes.includes(lane));
+      
+      if (invalidLanes.length > 0) {
+        // At least one wrong lane - lose a life and show correct lanes
         setValidationState('incorrect');
-        setWrongLane(lane);
-        // Show correct lanes + wrong lane for feedback
-        setActiveLanes([...currentTurn.lanes, lane]);
+        setWrongLane(invalidLanes[0]); // Show first invalid lane as wrong
+        // Show correct lanes + wrong lanes for feedback
+        setActiveLanes([...currentTurn.lanes, ...invalidLanes]);
         setPhase('validating');
         const newLives = lives - 1;
         setLives(newLives);
@@ -126,15 +130,15 @@ const LaneMemory: React.FC = () => {
             setWrongLane(null);
             playSequence(sequence);
           }
-        }, 2000); // Increased timeout to show feedback longer
+        }, 2000);
         return;
       }
 
-      // Correct lane for this turn - add to both trackers
-      const newInput = [...playerInput, lane];
+      // All lanes are correct for this turn - add to both trackers
+      const newInput = [...playerInput, ...lanes];
       setPlayerInput(newInput);
       
-      const newTurnClicks = [...currentTurnClicks, lane];
+      const newTurnClicks = [...currentTurnClicks, ...lanes];
       setCurrentTurnClicks(newTurnClicks);
 
       // Keep all clicked lanes in this turn highlighted
@@ -185,6 +189,44 @@ const LaneMemory: React.FC = () => {
     [phase, sequence, playerInput, lives, round, currentTurnIdx, currentTurnClicks, playSequence, generateSequence, updateScore, difficulty, score]
   );
 
+  const handleLaneClick = useCallback(
+    (lane: 'left' | 'center' | 'right') => {
+      processLaneInput([lane]);
+    },
+    [processLaneInput]
+  );
+
+  const handleLanesTouchStart = useCallback(
+    (lane: 'left' | 'center' | 'right', event: React.TouchEvent) => {
+      if (phase !== 'waiting-input') {
+        event.preventDefault();
+        return;
+      }
+      
+      setActiveTouches(prev => new Set([...prev, lane]));
+      event.preventDefault();
+    },
+    [phase]
+  );
+
+  const handleLanesTouchEnd = useCallback(
+    (event: React.TouchEvent) => {
+      if (phase !== 'waiting-input') {
+        event.preventDefault();
+        return;
+      }
+      
+      // Process all currently active touches as simultaneous input
+      if (activeTouches.size > 0) {
+        processLaneInput(Array.from(activeTouches));
+      }
+      
+      setActiveTouches(new Set());
+      event.preventDefault();
+    },
+    [phase, activeTouches, processLaneInput]
+  );
+
   const handleRulesStart = (dontShowAgain: boolean) => {
     if (dontShowAgain) {
       setRulesShown('lane-memory', true);
@@ -206,6 +248,7 @@ const LaneMemory: React.FC = () => {
     setCurrentTurnIdx(0);
     setCurrentTurnClicks([]);
     setWrongLane(null);
+    setActiveTouches(new Set());
     resetCurrentScore(`lane-memory-${difficulty}`);
     setPhase('playing-sequence');
 
@@ -303,7 +346,7 @@ const LaneMemory: React.FC = () => {
         {phase === 'waiting-input' && (
           <div className="instruction-text">
             <div className="instruction-title">Your turn!</div>
-            <div className="instruction-subtitle">Tap all lanes that lit up for this turn</div>
+            <div className="instruction-subtitle">Tap all lanes that lit up for this turn{sequence?.turns[currentTurnIdx]?.lanes.length > 1 ? ' (you can tap multiple at once!)' : ''}</div>
           </div>
         )}
         {phase === 'validating' && (
@@ -352,6 +395,8 @@ const LaneMemory: React.FC = () => {
               key={lane}
               className={getLaneClassName()}
               onClick={() => handleLaneClick(lane)}
+              onTouchStart={(e) => handleLanesTouchStart(lane, e)}
+              onTouchEnd={handleLanesTouchEnd}
               disabled={phase !== 'waiting-input'}
               aria-label={`${lane} lane`}
             />
